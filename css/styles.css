@@ -1,0 +1,752 @@
+/* =============================================================================
+   css/styles.css — Expense & Budget Visualizer
+   Sections:
+     1.  CSS Custom Properties (light + dark themes)
+     2.  Reset & Base Typography
+     3.  Layout — page grid
+     4.  Section cards
+     5.  Header & Theme Toggle
+     6.  Balance Display
+     7.  Input Form
+     8.  Sort Bar
+     9.  Transaction List
+    10.  Category Chips & Manager
+    11.  Chart
+    12.  Banner
+    13.  Responsive — ≤ 600 px single-column
+   ============================================================================= */
+
+/* =============================================================================
+   1. CSS Custom Properties
+      All colour tokens live here. Switching data-theme="dark" on <html>
+      swaps every token at once — no selector repetition needed.
+   ============================================================================= */
+
+:root,
+[data-theme="light"] {
+  /* Surfaces */
+  --color-bg:          #f3f4f6;
+  --color-surface:     #ffffff;
+  --color-surface-alt: #f9fafb;
+  --color-border:      #e5e7eb;
+
+  /* Text */
+  --color-text-primary:   #111827;
+  --color-text-secondary: #374151;
+  --color-text-muted:     #6b7280;
+  --color-text-placeholder: #9ca3af;
+
+  /* Brand / accent */
+  --color-brand:       #1d4ed8;
+  --color-brand-hover: #1e40af;
+  --color-brand-dark:  #1e3a8a;
+  --color-brand-ring:  rgba(29, 78, 216, 0.25);
+
+  /* Danger */
+  --color-danger:      #dc2626;
+  --color-danger-bg:   #fee2e2;
+  --color-danger-border:#fca5a5;
+  --color-danger-ring: rgba(220, 38, 38, 0.3);
+
+  /* Info */
+  --color-info-bg:     #eff6ff;
+  --color-info-border: #93c5fd;
+  --color-info-text:   #1e40af;
+
+  /* Input */
+  --color-input-bg:     #ffffff;
+  --color-input-border: #d1d5db;
+
+  /* Sort button */
+  --color-sort-bg:        #f3f4f6;
+  --color-sort-bg-hover:  #e5e7eb;
+  --color-sort-active-bg: #1d4ed8;
+  --color-sort-active-fg: #ffffff;
+
+  /* Scrollbar */
+  --color-scrollbar-track: #f3f4f6;
+  --color-scrollbar-thumb: #d1d5db;
+
+  /* Chart placeholder */
+  --color-chart-placeholder: #d1d5db;
+
+  /* Theme toggle */
+  --color-header-bg: #1d4ed8;
+  --color-header-fg: #ffffff;
+  --color-toggle-bg: rgba(255,255,255,0.15);
+  --color-toggle-bg-hover: rgba(255,255,255,0.25);
+  --color-toggle-border: rgba(255,255,255,0.3);
+}
+
+[data-theme="dark"] {
+  /* Surfaces */
+  --color-bg:          #0f172a;
+  --color-surface:     #1e293b;
+  --color-surface-alt: #273449;
+  --color-border:      #334155;
+
+  /* Text */
+  --color-text-primary:   #f1f5f9;
+  --color-text-secondary: #cbd5e1;
+  --color-text-muted:     #94a3b8;
+  --color-text-placeholder: #64748b;
+
+  /* Brand / accent */
+  --color-brand:       #60a5fa;
+  --color-brand-hover: #93c5fd;
+  --color-brand-dark:  #bfdbfe;
+  --color-brand-ring:  rgba(96, 165, 250, 0.3);
+
+  /* Danger */
+  --color-danger:      #f87171;
+  --color-danger-bg:   #451a1a;
+  --color-danger-border:#dc2626;
+  --color-danger-ring: rgba(248, 113, 113, 0.3);
+
+  /* Info */
+  --color-info-bg:     #1e3a5f;
+  --color-info-border: #3b82f6;
+  --color-info-text:   #93c5fd;
+
+  /* Input */
+  --color-input-bg:     #1e293b;
+  --color-input-border: #475569;
+
+  /* Sort button */
+  --color-sort-bg:        #1e293b;
+  --color-sort-bg-hover:  #334155;
+  --color-sort-active-bg: #60a5fa;
+  --color-sort-active-fg: #0f172a;
+
+  /* Scrollbar */
+  --color-scrollbar-track: #1e293b;
+  --color-scrollbar-thumb: #475569;
+
+  /* Chart placeholder */
+  --color-chart-placeholder: #334155;
+
+  /* Theme toggle */
+  --color-header-bg: #0f172a;
+  --color-header-fg: #f1f5f9;
+  --color-toggle-bg: rgba(255,255,255,0.08);
+  --color-toggle-bg-hover: rgba(255,255,255,0.15);
+  --color-toggle-border: rgba(255,255,255,0.15);
+}
+
+/* =============================================================================
+   2. Reset & Base Typography
+   ============================================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  /* Prevent flash of wrong theme — ThemeManager sets data-theme before paint */
+  color-scheme: light dark;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  line-height: 1.5;
+  min-width: 320px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: 1rem;
+}
+
+/* =============================================================================
+   3. Layout — page grid
+   ============================================================================= */
+
+main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "balance     form"
+    "chart       list"
+    "categories  categories";
+  gap: 1.25rem;
+  max-width: 1200px;
+  margin: 1.25rem auto;
+  padding: 0 1.25rem;
+}
+
+#balance-section    { grid-area: balance; }
+#form-section       { grid-area: form; }
+#chart-section      { grid-area: chart; }
+#list-section       { grid-area: list; }
+#categories-section { grid-area: categories; }
+
+/* =============================================================================
+   4. Section cards
+   ============================================================================= */
+
+main > section {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* =============================================================================
+   5. Header & Theme Toggle
+   ============================================================================= */
+
+header {
+  background-color: var(--color-header-bg);
+  color: var(--color-header-fg);
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.875rem;
+  min-height: 36px;
+  background-color: var(--color-toggle-bg);
+  color: var(--color-header-fg);
+  border: 1px solid var(--color-toggle-border);
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+}
+
+.theme-toggle-btn:hover {
+  background-color: var(--color-toggle-bg-hover);
+}
+
+.theme-toggle-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-brand-ring);
+}
+
+.theme-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* =============================================================================
+   6. Balance Display
+   ============================================================================= */
+
+#balance-display {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-brand);
+  margin-top: 0.25rem;
+  word-break: break-all;
+}
+
+/* =============================================================================
+   7. Input Form
+   ============================================================================= */
+
+#transaction-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.form-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--color-input-border);
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  color: var(--color-text-primary);
+  background-color: var(--color-input-bg);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease,
+              background-color 0.2s ease, color 0.2s ease;
+  min-height: 44px;
+}
+
+.form-group input::placeholder {
+  color: var(--color-text-placeholder);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 3px var(--color-brand-ring);
+}
+
+/* Remove native number spinners */
+.form-group input[type="number"]::-webkit-inner-spin-button,
+.form-group input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.form-group input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Select arrow color fix in dark mode */
+.form-group select {
+  appearance: auto;
+}
+
+.field-error {
+  font-size: 0.8125rem;
+  color: var(--color-danger);
+  min-height: 1.2em;
+}
+
+#transaction-form button[type="submit"] {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  min-height: 44px;
+  background-color: var(--color-brand);
+  color: #ffffff;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+  margin-top: 0.25rem;
+}
+
+#transaction-form button[type="submit"]:hover {
+  background-color: var(--color-brand-hover);
+}
+
+#transaction-form button[type="submit"]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-brand-ring);
+}
+
+#transaction-form button[type="submit"]:active {
+  background-color: var(--color-brand-dark);
+}
+
+/* =============================================================================
+   8. Sort Bar
+   ============================================================================= */
+
+#sort-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-bottom: 0.875rem;
+}
+
+.sort-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  margin-right: 0.25rem;
+  white-space: nowrap;
+}
+
+.sort-btn {
+  padding: 0.3rem 0.7rem;
+  min-height: 32px;
+  background-color: var(--color-sort-bg);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+              color 0.15s ease;
+}
+
+.sort-btn:hover {
+  background-color: var(--color-sort-bg-hover);
+}
+
+.sort-btn--active {
+  background-color: var(--color-sort-active-bg);
+  color: var(--color-sort-active-fg);
+  border-color: var(--color-sort-active-bg);
+}
+
+.sort-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-brand-ring);
+}
+
+/* =============================================================================
+   9. Transaction List
+   ============================================================================= */
+
+#list-section {
+  display: flex;
+  flex-direction: column;
+}
+
+#transaction-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  max-height: 380px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+/* Scrollbar styling (WebKit) */
+#transaction-list::-webkit-scrollbar { width: 6px; }
+#transaction-list::-webkit-scrollbar-track {
+  background: var(--color-scrollbar-track);
+  border-radius: 3px;
+}
+#transaction-list::-webkit-scrollbar-thumb {
+  background: var(--color-scrollbar-thumb);
+  border-radius: 3px;
+}
+
+.transaction-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  background-color: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.transaction-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  overflow: hidden;
+}
+
+.transaction-name {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--color-text-primary);
+}
+
+.transaction-meta {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.transaction-amount {
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: var(--color-brand);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Category badge — built-in colours */
+.category-badge {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.category-badge--food      { background-color: #fed7aa; color: #9a3412; }
+.category-badge--transport { background-color: #bfdbfe; color: #1e40af; }
+.category-badge--fun       { background-color: #e9d5ff; color: #6b21a8; }
+
+/* Soften built-in badge colours in dark mode */
+[data-theme="dark"] .category-badge--food      { background-color: rgba(249,115,22,0.2); color: #fdba74; }
+[data-theme="dark"] .category-badge--transport { background-color: rgba(59,130,246,0.2); color: #93c5fd; }
+[data-theme="dark"] .category-badge--fun       { background-color: rgba(168,85,247,0.2); color: #d8b4fe; }
+
+/* Delete button */
+.btn-delete {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  background-color: transparent;
+  border: 1px solid var(--color-danger-border);
+  border-radius: 0.375rem;
+  color: var(--color-danger);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-delete:hover {
+  background-color: var(--color-danger-bg);
+}
+
+.btn-delete:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-danger-ring);
+}
+
+.empty-state {
+  color: var(--color-text-placeholder);
+  font-size: 0.9375rem;
+  text-align: center;
+  padding: 1.5rem 0;
+}
+
+/* =============================================================================
+   10. Category Chips & Manager
+   ============================================================================= */
+
+#categories-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Inline form row: input + button side-by-side */
+.form-group--inline {
+  max-width: 480px;
+}
+
+.inline-input-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.inline-input-row input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-input-border);
+  border-radius: 0.5rem;
+  font-size: 0.9375rem;
+  color: var(--color-text-primary);
+  background-color: var(--color-input-bg);
+  min-height: 40px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease,
+              background-color 0.2s ease;
+}
+
+.inline-input-row input::placeholder {
+  color: var(--color-text-placeholder);
+}
+
+.inline-input-row input:focus {
+  outline: none;
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 3px var(--color-brand-ring);
+}
+
+.btn-add-cat {
+  padding: 0.5rem 1rem;
+  min-height: 40px;
+  background-color: var(--color-brand);
+  color: #ffffff;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-add-cat:hover {
+  background-color: var(--color-brand-hover);
+}
+
+.btn-add-cat:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-brand-ring);
+}
+
+/* Category chip list */
+.category-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  min-height: 2rem; /* reserves space even when empty */
+}
+
+/* Individual chip */
+.cat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.625rem 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+/* Built-in colour variants */
+.cat-chip--food      { background-color: #fed7aa; color: #9a3412; }
+.cat-chip--transport { background-color: #bfdbfe; color: #1e40af; }
+.cat-chip--fun       { background-color: #e9d5ff; color: #6b21a8; }
+
+[data-theme="dark"] .cat-chip--food      { background-color: rgba(249,115,22,0.2); color: #fdba74; }
+[data-theme="dark"] .cat-chip--transport { background-color: rgba(59,130,246,0.2); color: #93c5fd; }
+[data-theme="dark"] .cat-chip--fun       { background-color: rgba(168,85,247,0.2); color: #d8b4fe; }
+
+.cat-chip__label {
+  white-space: nowrap;
+}
+
+.cat-chip__delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: none;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.12);
+  color: inherit;
+  font-size: 0.65rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease;
+  line-height: 1;
+}
+
+.cat-chip__delete:hover {
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
+.cat-chip__delete:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-brand-ring);
+}
+
+/* =============================================================================
+   11. Chart
+   ============================================================================= */
+
+#chart-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#spending-chart {
+  max-width: 280px;
+  max-height: 280px;
+  width: 100%;
+}
+
+.chart-fallback {
+  color: var(--color-text-muted);
+  font-size: 0.9375rem;
+  text-align: center;
+  padding: 1.5rem 0;
+}
+
+/* =============================================================================
+   12. Banner
+   ============================================================================= */
+
+#banner {
+  max-width: 1200px;
+  margin: 0.75rem auto 0;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+#banner[hidden] { display: none; }
+
+#banner.banner--error {
+  background-color: var(--color-danger-bg);
+  border: 1px solid var(--color-danger-border);
+  color: var(--color-danger);
+}
+
+#banner.banner--info {
+  background-color: var(--color-info-bg);
+  border: 1px solid var(--color-info-border);
+  color: var(--color-info-text);
+}
+
+/* =============================================================================
+   13. Responsive — ≤ 600 px single-column stack
+   ============================================================================= */
+
+@media (max-width: 600px) {
+  main {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "balance"
+      "form"
+      "chart"
+      "list"
+      "categories";
+    padding: 0 0.75rem;
+    margin: 0.75rem auto;
+  }
+
+  h1 { font-size: 1.2rem; }
+
+  #balance-display { font-size: 1.5rem; }
+
+  #transaction-list { max-height: 300px; }
+
+  .theme-label { display: none; } /* icon-only on very small screens */
+
+  .form-group--inline { max-width: 100%; }
+}
+
+/* Wide screens: prevent overflow */
+@media (min-width: 1200px) {
+  main { padding: 0 2rem; }
+}

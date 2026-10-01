@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Expense &amp; Budget Visualizer</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <header>
+    <h1>Expense &amp; Budget Visualizer</h1>
+    <!-- Dark / Light mode toggle -->
+    <button
+      id="theme-toggle"
+      type="button"
+      class="theme-toggle-btn"
+      aria-pressed="false"
+      aria-label="Switch to dark mode"
+    >
+      <span class="theme-icon" aria-hidden="true">🌙</span>
+      <span class="theme-label">Dark mode</span>
+    </button>
+  </header>
+
+  <!-- Page-level non-blocking notification banner -->
+  <div id="banner" role="alert" aria-live="polite" hidden></div>
+
+  <main>
+
+    <!-- Balance Display Section -->
+    <section id="balance-section">
+      <h2>Total Balance</h2>
+      <p id="balance-display">$0.00</p>
+    </section>
+
+    <!-- Input Form Section -->
+    <section id="form-section">
+      <h2>Add Transaction</h2>
+      <form id="transaction-form" novalidate>
+
+        <div class="form-group">
+          <label for="item-name">Item name</label>
+          <input
+            id="item-name"
+            type="text"
+            maxlength="100"
+            autocomplete="off"
+            placeholder="e.g. Coffee"
+          />
+          <span class="field-error" id="name-error" role="alert" aria-live="polite"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="amount">Amount ($)</label>
+          <input
+            id="amount"
+            type="number"
+            step="0.01"
+            min="0.01"
+            max="999999.99"
+            placeholder="0.00"
+          />
+          <span class="field-error" id="amount-error" role="alert" aria-live="polite"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="category">Category</label>
+          <select id="category">
+            <option value="">Select&hellip;</option>
+            <option value="Food">Food</option>
+            <option value="Transport">Transport</option>
+            <option value="Fun">Fun</option>
+          </select>
+          <span class="field-error" id="category-error" role="alert" aria-live="polite"></span>
+        </div>
+
+        <button type="submit">Add Transaction</button>
+
+      </form>
+    </section>
+
+    <!-- Spending Chart Section -->
+    <section id="chart-section">
+      <h2>Spending by Category</h2>
+      <canvas
+        id="spending-chart"
+        aria-label="Pie chart of spending by category"
+        role="img"
+      ></canvas>
+    </section>
+
+    <!-- Transaction List Section -->
+    <section id="list-section">
+      <h2>Transactions</h2>
+
+      <!-- Sort controls -->
+      <div id="sort-bar" role="group" aria-label="Sort transactions">
+        <span class="sort-label">Sort by:</span>
+        <button type="button" class="sort-btn sort-btn--active" data-sort="date-desc"   aria-pressed="true">Newest</button>
+        <button type="button" class="sort-btn" data-sort="date-asc"    aria-pressed="false">Oldest</button>
+        <button type="button" class="sort-btn" data-sort="amount-desc" aria-pressed="false">$ High→Low</button>
+        <button type="button" class="sort-btn" data-sort="amount-asc"  aria-pressed="false">$ Low→High</button>
+        <button type="button" class="sort-btn" data-sort="category-asc" aria-pressed="false">Category</button>
+      </div>
+
+      <ul id="transaction-list"></ul>
+    </section>
+
+    <!-- Custom Categories Section -->
+    <section id="categories-section">
+      <h2>Manage Categories</h2>
+
+      <!-- Add category form -->
+      <form id="add-category-form" novalidate>
+        <div class="form-group form-group--inline">
+          <label for="new-category-input">New category</label>
+          <div class="inline-input-row">
+            <input
+              id="new-category-input"
+              type="text"
+              maxlength="40"
+              autocomplete="off"
+              placeholder="e.g. Health"
+            />
+            <button type="submit" class="btn-add-cat">Add</button>
+          </div>
+          <span class="field-error" id="new-category-error" role="alert" aria-live="polite"></span>
+        </div>
+      </form>
+
+      <!-- Category chips -->
+      <div id="category-chips" class="category-chips" role="list" aria-label="Existing categories"></div>
+    </section>
+
+  </main>
+
+  <!-- Chart.js 4.x from CDN — must load before app.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
